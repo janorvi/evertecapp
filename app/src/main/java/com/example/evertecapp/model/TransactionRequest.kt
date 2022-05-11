@@ -1,5 +1,6 @@
 package com.example.evertecapp.model
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class TransactionRequest(
@@ -12,7 +13,7 @@ data class TransactionRequest(
 }
 
 data class Authorization(
-    @SerializedName("login") val login: String,
+    @Expose @SerializedName ("login") val login: String,
     @SerializedName("tranKey") val tranKey: String,
     @SerializedName("nonce") val nonce: String,
     @SerializedName("seed") val seed: String){
