@@ -6,96 +6,104 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.example.evertecapp.R
 import com.example.evertecapp.model.*
 import com.example.evertecapp.utils.Commons
+import com.example.evertecapp.utils.Constants
 import com.example.evertecapp.viewmodel.TransactionInfoFragmentViewModel
 import com.example.evertecapp.viewmodel.TransactionInfoFragmentViewModelFactory
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [TransactionInfoFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class TransactionInfoFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    //to declare edit texts, button and view model
+    private var payerNameEditText: EditText? = null
+    private var payerEmailEditText: EditText? = null
+    private var payerPhoneEditText: EditText? = null
+    private var cardNumberEditText: EditText? = null
+    private var expiryDateEditText: EditText? = null
+    private var cvvEditText: EditText? = null
+    private var amountEditText: EditText? = null
+    private var sendTransactionButton: Button? = null
     private var transactionInfoFragmentViewModel: TransactionInfoFragmentViewModel? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        //to inflate the layout for this fragment
         var rootView = inflater.inflate(R.layout.fragment_transaction_info, container, false)
+
+        //to set fragment edit texts and button
+        payerNameEditText = rootView.findViewById(R.id.payer_name_edit_text)
+        payerEmailEditText = rootView.findViewById(R.id.payer_email_edit_text)
+        payerPhoneEditText = rootView.findViewById(R.id.payer_phone_edit_text)
+        cardNumberEditText = rootView.findViewById(R.id.card_number_edit_text)
+        expiryDateEditText = rootView.findViewById(R.id.expiry_date_edit_text)
+        cvvEditText = rootView.findViewById(R.id.cvv_edit_text)
+        amountEditText = rootView.findViewById(R.id.amount_edit_text)
+        sendTransactionButton = rootView.findViewById(R.id.send_transaction_button)
+
+        //to create view model factory
         var transactionInfoFragmentViewModelFactory: TransactionInfoFragmentViewModelFactory? = activity?.let {
             TransactionInfoFragmentViewModelFactory.createFactory(it)
         }
+
+        //to create view model
         transactionInfoFragmentViewModel = ViewModelProviders.of(this, transactionInfoFragmentViewModelFactory).get(TransactionInfoFragmentViewModel::class.java)
 
-        ///////////////////////////////////
-        val nonce = Commons.getRandom()
-        val seed = Commons.getCurrentDateFormat()
-        val nonceBase64 = Commons.getBase64(nonce.toByteArray())
-        val tranKeyBase64 = Commons.getBase64(Commons.getSHA256(nonce + seed + "024h1IlD"))
+        //to observe transactionResponse live data
+        transactionInfoFragmentViewModel?.transactionResponse?.observe(viewLifecycleOwner){ response ->
+            //to add required information about transaction response in local storage
+            if(response != null) {
+                transactionInfoFragmentViewModel?.insert(getTransaction(response))
+            }
+        }
 
-        val authorization = Authorization("6dd490faf9cb87a9862245da41170ff2",tranKeyBase64,nonceBase64,seed)
+        //to observe transactionProccessFailed live data
+        transactionInfoFragmentViewModel?.transactionProccessFailed?.observe(viewLifecycleOwner){ error ->
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+        }
 
-        val payer = Payer("Diego","Calle","dnetix@yopmail.com","cc","809284521","3214567")
+        //to observe storageFailed live data
+        transactionInfoFragmentViewModel?.storageFailed?.observe(viewLifecycleOwner){ error ->
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+        }
 
-        val amount = Amount("COP",100)
-        val payment = Payment("001","Compra",amount)
-
-        val card = Card("007000000027","12/18","123",3)
-        val instrument = Instrument(card)
-
-        val transactionRequest = TransactionRequest(authorization, payer, payment, instrument, "190.85.90.130", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
-        ///////////////////////////////////
-
-        transactionInfoFragmentViewModel?.sendTransaction(transactionRequest)
-        transactionInfoFragmentViewModel?.transactionResponse?.observe(viewLifecycleOwner){
-            val status = it.status
-            val transactionStatus = status.status
-            val reason = status.message
-            Log.i("response_status",transactionStatus)
-            Log.i("response_reason",reason)
+        //to send transaction request when send authorization button is clicked
+        sendTransactionButton?.setOnClickListener(){
+            transactionInfoFragmentViewModel?.sendTransaction(getTransactionRequest())
         }
 
         return rootView
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment TransactionInfoFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TransactionInfoFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    //to build and return a transaction object
+    fun getTransaction(response: TransactionResponse): Transaction{
+        val status = response.status
+        val amount = response.amount
+        return Transaction(0, response.reference, amount.total, payerNameEditText?.text.toString(), payerEmailEditText?.text.toString(), payerPhoneEditText?.text.toString(), cardNumberEditText?.text.toString(), status.status)
+    }
+
+    //to build and return a transaction request
+    fun getTransactionRequest(): TransactionRequest{
+
+        //to codificate authorization info
+        val nonce = Commons.getRandom()
+        val seed = Commons.getCurrentDateFormat()
+        val nonceBase64 = Commons.getBase64(nonce.toByteArray())
+        val tranKeyBase64 = Commons.getBase64(Commons.getSHA256(nonce + seed + Constants.placeToPaytranKey))
+
+        val authorization = Authorization(Constants.placeToPayLogin, tranKeyBase64, nonceBase64, seed)
+
+        val payer = Payer(payerNameEditText?.text.toString(), Constants.payerSurname, payerEmailEditText?.text.toString(), Constants.payerDocumentType, Constants.payerDocumentNumber, payerPhoneEditText?.text.toString())
+
+        val amount = Amount(Constants.paymentCurrency, Integer.parseInt(amountEditText?.text.toString()))
+        val payment = Payment(Constants.paymentReference, Constants.paymentDescription, amount)
+
+        val card = Card(cardNumberEditText?.text.toString(), expiryDateEditText?.text.toString(), cvvEditText?.text.toString(),3)
+        val instrument = Instrument(card)
+
+        return TransactionRequest(authorization, payer, payment, instrument, Constants.transactionRequestIP, Constants.transactionRequestUserAgent)
     }
 }

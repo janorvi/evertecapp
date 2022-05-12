@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 class Transaction(
     @PrimaryKey(autoGenerate = true) var id: Int,
     @ColumnInfo(name = "transaction_reference") var reference: String,
-    @ColumnInfo(name = "transaction_amount") var amount: String,
+    @ColumnInfo(name = "transaction_amount_total") var amountTotal: Int,
     @ColumnInfo(name = "transaction_payer_name") var payerName: String,
     @ColumnInfo(name = "transaction_payer_email") var payerEmail: String,
     @ColumnInfo(name = "transaction_payer_phone") var payerPhone: String,
