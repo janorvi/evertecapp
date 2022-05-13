@@ -72,7 +72,18 @@ class TransactionInfoFragment : Fragment() {
 
         //to send transaction request when send authorization button is clicked
         sendTransactionButton?.setOnClickListener(){
-            transactionInfoFragmentViewModel?.sendTransaction(getTransactionRequest())
+
+            if(validateFields()) {
+                try{
+                    //to validate if amount is numeric
+                    Integer.parseInt(amountEditText?.getText().toString())
+                    transactionInfoFragmentViewModel?.sendTransaction(getTransactionRequest())
+                }catch (e: Exception){
+                    Toast.makeText(context, "Amount should be a number.",Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                Toast.makeText(context, "Some field is empty, please review.",Toast.LENGTH_SHORT).show()
+            }
         }
 
         return rootView
@@ -83,6 +94,33 @@ class TransactionInfoFragment : Fragment() {
         val status = response.status
         val amount = response.amount
         return Transaction(0, response.reference, amount.total, payerNameEditText?.text.toString(), payerEmailEditText?.text.toString(), payerPhoneEditText?.text.toString(), cardNumberEditText?.text.toString(), status.status)
+    }
+
+    //to validate fields value
+    fun validateFields(): Boolean{
+        var success = true
+        if(payerNameEditText?.text.toString().isNullOrEmpty()){
+            success = false
+        }
+        if(payerEmailEditText?.text.toString().isNullOrEmpty()){
+            success = false
+        }
+        if(payerPhoneEditText?.text.toString().isNullOrEmpty()){
+            success = false
+        }
+        if(cardNumberEditText?.text.toString().isNullOrEmpty()){
+            success = false
+        }
+        if(expiryDateEditText?.text.toString().isNullOrEmpty()){
+            success = false
+        }
+        if(payerNameEditText?.text.toString().isNullOrEmpty()){
+            success = false
+        }
+        if(amountEditText?.text.toString().isNullOrEmpty()){
+            success = false
+        }
+        return success
     }
 
     //to build and return a transaction request

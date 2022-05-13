@@ -18,7 +18,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Put name:" />
+                android:text="Put payer name:" />
 
             <EditText
                 android:id="@+id/payer_name_edit_text"
@@ -35,7 +35,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Put email:" />
+                android:text="Put payer email:" />
 
             <EditText
                 android:id="@+id/payer_email_edit_text"
@@ -52,7 +52,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Put phone:" />
+                android:text="Put payer phone:" />
 
             <EditText
                 android:id="@+id/payer_phone_edit_text"

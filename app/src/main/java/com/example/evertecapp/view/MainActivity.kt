@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        replaceFragment(transactionInfoFragment)
     }
 
     private fun replaceFragment(fragment: Fragment){
