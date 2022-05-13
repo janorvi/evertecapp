@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -76,6 +77,27 @@ class TransactionsFragment : Fragment() {
                 groupAdapter.add(TransactionItem(transaction))
             }
             recyclerView.adapter = groupAdapter
+        }
+
+        //to observe transaction live data
+        transactionViewModel?.transaction?.observe(viewLifecycleOwner){ transaction ->
+            if(transaction != null) {
+                val transactionItem = TransactionItem(transaction)
+                groupAdapter.clear()
+                groupAdapter.add(transactionItem)
+                recyclerView.adapter = groupAdapter
+            }else {
+                Toast.makeText(context,"Don't exists any authorization with the selected number.", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        searchButton?.setOnClickListener{
+            if(!numberEditText?.text.toString().isNullOrEmpty()) {
+                transactionViewModel?.getTransactionByNumber(Integer.parseInt(numberEditText?.text.toString()))
+            }else{
+                transactionViewModel?.getAllTransactions()
+                Toast.makeText(context,"Number field is empty.", Toast.LENGTH_LONG).show()
+            }
         }
 
         return rootView

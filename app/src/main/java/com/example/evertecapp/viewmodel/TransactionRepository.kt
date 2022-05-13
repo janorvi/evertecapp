@@ -33,5 +33,7 @@ class TransactionRepository(
 
     suspend fun getAllTransactions() = transactionDAO?.getAllTransactions()
 
+    suspend fun geTransactionByNumber(number: Int) = transactionDAO?.getTransactionByNumber(number)
+
     suspend fun sendTransaction(transactionRequest: TransactionRequest) = apiService?.sendTransaction(transactionRequest)
 }

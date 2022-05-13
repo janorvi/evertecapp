@@ -11,6 +11,9 @@ interface TransactionDAO {
     @Insert
     suspend fun insert(transaction: Transaction)
 
+    @Query("select * from transactions_table where id =:number")
+    suspend fun getTransactionByNumber(number: Int): Transaction
+
     @Query("select * from transactions_table")
     suspend fun getAllTransactions(): List<Transaction>
 }
