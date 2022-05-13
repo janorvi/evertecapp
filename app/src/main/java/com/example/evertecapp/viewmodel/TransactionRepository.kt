@@ -31,5 +31,7 @@ class TransactionRepository(
 
     suspend fun insert(transaction: Transaction) = transactionDAO?.insert(transaction)
 
+    suspend fun getAllTransactions() = transactionDAO?.getAllTransactions()
+
     suspend fun sendTransaction(transactionRequest: TransactionRequest) = apiService?.sendTransaction(transactionRequest)
 }

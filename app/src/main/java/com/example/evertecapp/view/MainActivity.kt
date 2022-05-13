@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
     private val transactionInfoFragment = TransactionInfoFragment()
+    private val transactionsFragment = TransactionsFragment()
     private var bottomNavigationView: BottomNavigationView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView?.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.transaction_info_item -> replaceFragment(transactionInfoFragment)
+                R.id.transactions_list_item -> replaceFragment(transactionsFragment)
             }
             true
         }

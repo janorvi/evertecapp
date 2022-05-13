@@ -17,6 +17,7 @@ class TransactionInfoFragmentViewModel(
     val transactionProccessFailed: MutableLiveData<String> = MutableLiveData()
     val transactionResponse: MutableLiveData<TransactionResponse> = MutableLiveData()
     val insertSuccess: MutableLiveData<Boolean> = MutableLiveData()
+    val transactionList: MutableLiveData<List<Transaction>> = MutableLiveData()
 
     fun insert(transaction: Transaction) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -28,6 +29,21 @@ class TransactionInfoFragmentViewModel(
                     storageFailed.postValue("Storage process was failed.")
                 }
             }catch(e: Exception){
+                storageFailed.postValue("Storage process was failed: $e")
+            }
+        }
+    }
+
+    fun getAllTransactions() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try{
+                val response = transactionRepository.getAllTransactions()
+                if(response != null){
+                    transactionList.postValue(response)
+                }else{
+                    storageFailed.postValue("Storage process was failed.")
+                }
+            }catch (e: Exception){
                 storageFailed.postValue("Storage process was failed: $e")
             }
         }

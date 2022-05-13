@@ -56,4 +56,7 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:4.5.0"
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2")
+    //groupie
+    implementation ('com.xwray:groupie:2.7.0')
+    implementation ('com.xwray:groupie-kotlin-android-extensions:2.7.0')
 }

@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/transaction_info_item"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="New Transaction"/>
+        android:icon="@drawable/ic_baseline_add_24"
+        android:title="New"/>
+
+    <item
+        android:id="@+id/transactions_list_item"
+        android:icon="@drawable/ic_baseline_format_list_bulleted_24"
+        android:title="List"/>
 </menu>
