@@ -14,7 +14,7 @@ class TransactionInfoFragmentViewModel(
     var transactionRepository: TransactionRepository
 ): ViewModel(){
     val storageFailed: MutableLiveData<String> = MutableLiveData()
-    val transactionProccessFailed: MutableLiveData<String> = MutableLiveData()
+    val transactionProcessFailed: MutableLiveData<String> = MutableLiveData()
     val transactionResponse: MutableLiveData<TransactionResponse> = MutableLiveData()
     val insertSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val transactionList: MutableLiveData<List<Transaction>> = MutableLiveData()
@@ -72,10 +72,10 @@ class TransactionInfoFragmentViewModel(
                 if (response?.body() != null) {
                     transactionResponse.postValue(response?.body())
                 }else{
-                    transactionProccessFailed.postValue("Transaction process was failed: " + response?.errorBody().toString())
+                    transactionProcessFailed.postValue("Transaction process was failed: " + response?.errorBody().toString())
                 }
             }catch(e: Exception){
-                transactionProccessFailed.postValue("Transaction process was failed: $e")
+                transactionProcessFailed.postValue("Transaction process was failed: $e")
             }
         }
     }

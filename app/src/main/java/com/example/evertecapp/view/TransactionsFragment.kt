@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -40,6 +41,7 @@ class TransactionsFragment : Fragment() {
     private var searchButton: Button? = null
 
     private var transactionViewModel: TransactionInfoFragmentViewModel? = null
+    private var transactionDialogFragment: DialogFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,10 +93,19 @@ class TransactionsFragment : Fragment() {
             }
         }
 
+        groupAdapter.setOnItemClickListener { item, view ->
+            var transactionItem = item as TransactionItem
+            transactionDialogFragment = TransactionDialogFragment.newInstance(transactionItem.transaction)
+            transactionDialogFragment?.isCancelable = false
+            transactionDialogFragment?.show(parentFragmentManager,"Transaction Fragment")
+        }
+
         searchButton?.setOnClickListener{
             if(!numberEditText?.text.toString().isNullOrEmpty()) {
                 transactionViewModel?.getTransactionByNumber(Integer.parseInt(numberEditText?.text.toString()))
             }else{
+                groupAdapter.clear()
+                recyclerView.adapter = groupAdapter
                 transactionViewModel?.getAllTransactions()
                 Toast.makeText(context,"Number field is empty.", Toast.LENGTH_LONG).show()
             }

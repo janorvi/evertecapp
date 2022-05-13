@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.evertecapp.R
 import com.example.evertecapp.model.*
@@ -29,6 +30,7 @@ class TransactionInfoFragment : Fragment() {
     private var amountEditText: EditText? = null
     private var sendTransactionButton: Button? = null
     private var transactionInfoFragmentViewModel: TransactionInfoFragmentViewModel? = null
+    private var transactionDialogFragment: TransactionDialogFragment? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //to inflate the layout for this fragment
@@ -57,11 +59,15 @@ class TransactionInfoFragment : Fragment() {
             //to add required information about transaction response in local storage
             if(response != null) {
                 transactionInfoFragmentViewModel?.insert(getTransaction(response))
+                transactionDialogFragment = TransactionDialogFragment.newInstance(getTransaction(response))
+                transactionDialogFragment?.isCancelable = false
+                transactionDialogFragment?.show(parentFragmentManager, "Transaction Dialog")
+                clearFields()
             }
         }
 
-        //to observe transactionProccessFailed live data
-        transactionInfoFragmentViewModel?.transactionProccessFailed?.observe(viewLifecycleOwner){ error ->
+        //to observe transactionProcessFailed live data
+        transactionInfoFragmentViewModel?.transactionProcessFailed?.observe(viewLifecycleOwner){ error ->
             Toast.makeText(context, error, Toast.LENGTH_LONG).show()
         }
 
@@ -74,12 +80,17 @@ class TransactionInfoFragment : Fragment() {
         sendTransactionButton?.setOnClickListener(){
 
             if(validateFields()) {
-                try{
-                    //to validate if amount is numeric
-                    Integer.parseInt(amountEditText?.getText().toString())
-                    transactionInfoFragmentViewModel?.sendTransaction(getTransactionRequest())
-                }catch (e: Exception){
-                    Toast.makeText(context, "Amount should be a number.",Toast.LENGTH_SHORT).show()
+                //to validate card number
+                if(cardNumberEditText?.getText().toString().length >= 4) {
+                    try {
+                        //to validate if amount is numeric
+                        Integer.parseInt(amountEditText?.getText().toString())
+                        transactionInfoFragmentViewModel?.sendTransaction(getTransactionRequest())
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Amount should be a number.", Toast.LENGTH_SHORT).show()
+                    }
+                }else{
+                    Toast.makeText(context, "Card number should have at least four digits.", Toast.LENGTH_SHORT).show()
                 }
             }else{
                 Toast.makeText(context, "Some field is empty, please review.",Toast.LENGTH_SHORT).show()
@@ -94,6 +105,17 @@ class TransactionInfoFragment : Fragment() {
         val status = response.status
         val amount = response.amount
         return Transaction(0, response.reference, amount.total, payerNameEditText?.text.toString(), payerEmailEditText?.text.toString(), payerPhoneEditText?.text.toString(), cardNumberEditText?.text.toString(), status.status)
+    }
+
+    //to clear fields
+    fun clearFields(){
+        payerNameEditText?.setText("")
+        payerEmailEditText?.setText("")
+        payerPhoneEditText?.setText("")
+        cardNumberEditText?.setText("")
+        expiryDateEditText?.setText("")
+        cvvEditText?.setText("")
+        amountEditText?.setText("")
     }
 
     //to validate fields value
@@ -114,7 +136,7 @@ class TransactionInfoFragment : Fragment() {
         if(expiryDateEditText?.text.toString().isNullOrEmpty()){
             success = false
         }
-        if(payerNameEditText?.text.toString().isNullOrEmpty()){
+        if(cvvEditText?.text.toString().isNullOrEmpty()){
             success = false
         }
         if(amountEditText?.text.toString().isNullOrEmpty()){
